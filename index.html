@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAVACH | AI Hospital Bill Auditor</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <!-- Include jsPDF Library for PDF Generation -->
+    <script src="https://cloudflare.com"></script>
+</head>
+<body>
+    <!-- ... [Rest of your previous HTML Navbar and Hero Sections] ... -->
+
+    <section id="demo" class="demo-section">
+        <div class="demo-container">
+            <h2>Experience the Audit</h2>
+            <div class="upload-box" id="drop-zone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Upload your hospital bill (PDF/JPG)</p>
+                <button class="btn-primary" id="audit-btn" onclick="simulateAudit()">Start AI Audit</button>
+            </div>
+            
+            <div id="audit-result" class="hidden">
+                <div class="audit-card">
+                    <h3 id="audit-status">🛡️ Audit Complete</h3>
+                    <div id="audit-text">Analyzing items...</div>
+                    <div id="action-area" class="hidden">
+                        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+                        <p>We've prepared a formal dispute letter based on these findings.</p>
+                        <button class="btn-secondary" onclick="generatePDF()" style="margin-top: 10px;">
+                            <i class="fas fa-file-pdf"></i> Download Dispute Letter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Use jsPDF from the window object
+        const { jsPDF } = window.jspdf;
+
+        function simulateAudit() {
+            const result = document.getElementById('audit-result');
+            const text = document.getElementById('audit-text');
+            const actions = document.getElementById('action-area');
+            const btn = document.getElementById('audit-btn');
+
+            btn.innerText = "Processing...";
+            result.classList.remove('hidden');
+            
+            setTimeout(() => {
+                text.innerHTML = `
+                    <div style="text-align: left; max-width: 500px; margin: 0 auto;">
+                        <p style="color: #e74c3c; font-weight: bold;">⚠️ Overcharge Found: ₹24,000 (Pharmacy & Room Rent)</p>
+                        <p style="color: #2ecc71; font-weight: bold;">✅ Coverable via Ayushman Bharat: ₹87,500</p>
+                        <p><strong>Total Potential Recovery: ₹1,11,500</strong></p>
+                    </div>
+                `;
+                actions.classList.remove('hidden');
+                btn.innerText = "Audit Complete";
+            }, 2000);
+        }
+
+        function generatePDF() {
+            const doc = new jsPDF();
+            const date = new Date().toLocaleDateString();
+
+            // Professional Letter Content
+            doc.setFontSize(18);
+            doc.text("KAVACH Bill Dispute Letter", 20, 20);
+            
+            doc.setFontSize(12);
+            doc.text(`Date: ${date}`, 20, 35);
+            doc.text("To,", 20, 45);
+            doc.text("The Billing Manager / Grievance Cell,", 20, 52);
+            doc.text("[Hospital Name Address - Edit Here]", 20, 59);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Subject: Formal Dispute Regarding Overcharging and Insurance Coverage", 20, 75);
+            
+            doc.setFont("helvetica", "normal");
+            const bodyText = `I am writing to formally dispute the charges on the hospital bill dated ${date}. After a thorough audit using KAVACH AI, we have identified discrepancies where services were billed above CGHS/Government approved rates.
+
+Specifically, we dispute the following:
+1. Pharmacy Charges: Overcharged by ₹14,000 (Exceeds MRP/Standard rates).
+2. Room Rent: Overcharged by ₹10,000 (Categorization mismatch).
+3. Eligibility: ₹87,500 should have been processed via Ayushman Bharat as per scheme guidelines.
+
+I request a detailed review and a revised bill within 48 hours. Failure to resolve this will lead to an official complaint through the National Health Authority (NHA) grievance portal.`;
+
+            // Wrap text to fit page width
+            const splitText = doc.splitTextToSize(bodyText, 170);
+            doc.text(splitText, 20, 85);
+
+            doc.text("Sincerely,", 20, 150);
+            doc.text("[Patient/Relative Name]", 20, 160);
+            doc.text("Contact Number: [Insert Here]", 20, 167);
+
+            // Download the PDF
+            doc.save("Kavach_Dispute_Letter.pdf");
+        }
+    </script>
+</body>
+</html>
